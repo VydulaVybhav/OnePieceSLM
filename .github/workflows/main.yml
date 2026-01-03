@@ -1,0 +1,25 @@
+name: Deploy to Local K8s
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted  # Uses your local runner
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Build Docker image
+      run: |
+        docker build -t my-app:${{ github.sha }} .
+        docker tag my-app:${{ github.sha }} my-app:latest
+    
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl apply -f k8s/
+        kubectl set image deployment/my-app my-app=my-app:${{ github.sha }}
+        kubectl rollout status deployment/my-app
