@@ -15,11 +15,12 @@ jobs:
     
     - name: Build Docker image
       run: |
-        docker build -t my-app:${{ github.sha }} .
-        docker tag my-app:${{ github.sha }} my-app:latest
-    
+        docker build -t streamlit-app:${{ github.sha }} .
+        docker tag streamlit-app:${{ github.sha }} streamlit-app:latest
+
     - name: Deploy to Kubernetes
       run: |
+        kubectl config use-context docker-desktop
         kubectl apply -f k8s/
-        kubectl set image deployment/my-app my-app=my-app:${{ github.sha }}
-        kubectl rollout status deployment/my-app
+        kubectl set image deployment/streamlit-app streamlit-app=streamlit-app:${{ github.sha }}
+        kubectl rollout status deployment/streamlit-app
